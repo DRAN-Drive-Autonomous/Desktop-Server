@@ -21,6 +21,8 @@
 
 # All the models
 /src/assets/models/*
+*.h5
+*.hdf5
 
 # Miscellaneous
 .DS_Store

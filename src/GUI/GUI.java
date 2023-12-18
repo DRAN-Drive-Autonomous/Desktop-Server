@@ -1,6 +1,4 @@
-package GUI;
-import Server.Server;
-
+package gui;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 
@@ -22,6 +20,11 @@ import java.awt.CardLayout;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
+
+import aiOps.FCar;
+import aiOps.OCR;
+import server.Server;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
@@ -90,6 +93,15 @@ public class GUI {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		OCR tessocr = new OCR();
+		float currentCarSpeed = tessocr.doOCR();
+		FCar pidCar = new FCar();
+		pidCar.initiatePID(60);
+		System.out.println("Car Name: " + pidCar.name);
+		System.out.println("Owner Name: " + pidCar.owner);
+		System.out.println("Car Speed: " + currentCarSpeed);
+		System.out.println("PID Action: " + pidCar.sendPIDAction(currentCarSpeed));
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -119,10 +131,13 @@ public class GUI {
 	 * @throws Exception 
 	 */
 	private void initialize() throws Exception {
+		Color orangeColor = new Color(255, 136, 0);
+		Color darkColor = new Color(34, 34, 44);
+		
 		MainFrame = new JFrame();
-		MainFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\DRAN\\server\\Server\\src\\assets\\images\\logo.png"));
+		MainFrame.setIconImage(Toolkit.getDefaultToolkit().getImage("./src/assets/images/logo.png"));
 		MainFrame.setTitle("DRAN - Drive Autonomous");
-		MainFrame.getContentPane().setBackground(new Color(242, 166, 249));
+		MainFrame.getContentPane().setBackground(orangeColor);
 //		frame.setSize(screen);
 		MainFrame.setBounds(0, 0, 1440, 800);
 		MainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -148,7 +163,7 @@ public class GUI {
 		int lowerOutputSubPanelY = outputSubPanelHeight + 9;
 		
 		JPanel GrabImagePanel = new JPanel();
-		GrabImagePanel.setBackground(new Color(242, 217, 249));
+		GrabImagePanel.setBackground(darkColor);
 		GrabImagePanel.setBounds(8, 8, mainPanelWidth, mainPanelHeight);
 		MainFrame.getContentPane().add(GrabImagePanel);
 		
@@ -158,13 +173,13 @@ public class GUI {
 		GrabImagePanel.add(GrabbedImage);
 		
 		JPanel OutputMainPanel = new JPanel();
-		OutputMainPanel.setBackground(new Color(242, 166, 249));
+		OutputMainPanel.setBackground(orangeColor);
 		OutputMainPanel.setBounds(rightPanelX, 8, mainPanelWidth, mainPanelHeight);
 		MainFrame.getContentPane().add(OutputMainPanel);
 		OutputMainPanel.setLayout(null);
 		
 		JPanel LaneDetectionPanel = new JPanel();
-		LaneDetectionPanel.setBackground(new Color(242, 217, 249));
+		LaneDetectionPanel.setBackground(darkColor);
 		LaneDetectionPanel.setBounds(0, 0, outputSubPanelWidth, outputSubPanelHeight);
 		OutputMainPanel.add(LaneDetectionPanel);
 		LaneDetectionPanel.setLayout(null);
@@ -174,7 +189,7 @@ public class GUI {
 		LaneDetectionPanel.add(LaneSegmentImage);
 		
 		JPanel TrafficDetectionPanel = new JPanel();
-		TrafficDetectionPanel.setBackground(new Color(242, 217, 249));
+		TrafficDetectionPanel.setBackground(darkColor);
 		TrafficDetectionPanel.setBounds(rightOutputSubPanelX, 0, outputSubPanelWidth, outputSubPanelHeight);
 		OutputMainPanel.add(TrafficDetectionPanel);
 		TrafficDetectionPanel.setLayout(null);
@@ -184,7 +199,7 @@ public class GUI {
 		TrafficDetectionPanel.add(TrafficSegmentImage);
 		
 		JPanel TrafficLightDetectionPanel = new JPanel();
-		TrafficLightDetectionPanel.setBackground(new Color(242, 217, 249));
+		TrafficLightDetectionPanel.setBackground(darkColor);
 		TrafficLightDetectionPanel.setBounds(0, lowerOutputSubPanelY, outputSubPanelWidth, outputSubPanelHeight);
 		OutputMainPanel.add(TrafficLightDetectionPanel);
 		TrafficLightDetectionPanel.setLayout(null);
@@ -194,65 +209,72 @@ public class GUI {
 		TrafficLightDetectionPanel.add(TrafficLightSegmentImage);
 		
 		JPanel FinalOutputPanel = new JPanel();
-		FinalOutputPanel.setBackground(new Color(242, 217, 249));
+		FinalOutputPanel.setBackground(darkColor);
 		FinalOutputPanel.setBounds(rightOutputSubPanelX, lowerOutputSubPanelY, outputSubPanelWidth, outputSubPanelHeight);
 		OutputMainPanel.add(FinalOutputPanel);
 		FinalOutputPanel.setLayout(null);
 		
 		JLabel SpeedLabel = new JLabel("Current Speed");
+		SpeedLabel.setForeground(Color.WHITE);
 		SpeedLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		SpeedLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		SpeedLabel.setBounds(0, 0, outputSubPanelWidth/2, outputSubPanelHeight/2);
 		FinalOutputPanel.add(SpeedLabel);
 		
 		JLabel KeyLabel = new JLabel("Key Pressed");
+		KeyLabel.setForeground(Color.WHITE);
 		KeyLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		KeyLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		KeyLabel.setBounds(0, outputSubPanelHeight/2, outputSubPanelWidth/2, outputSubPanelHeight/2);
 		FinalOutputPanel.add(KeyLabel);
 		
 		JLabel Colon1 = new JLabel(":");
+		Colon1.setForeground(Color.WHITE);
 		Colon1.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		Colon1.setHorizontalAlignment(SwingConstants.CENTER);
 		Colon1.setBounds(outputSubPanelWidth/2, 0, outputSubPanelWidth/4, outputSubPanelHeight/2);
 		FinalOutputPanel.add(Colon1);
 		
 		JLabel Colon2 = new JLabel(":");
+		Colon2.setForeground(Color.WHITE);
 		Colon2.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		Colon2.setHorizontalAlignment(SwingConstants.CENTER);
 		Colon2.setBounds(outputSubPanelWidth/2, outputSubPanelHeight/2, outputSubPanelWidth/4, outputSubPanelHeight/2);
 		FinalOutputPanel.add(Colon2);
 		
 		JLabel SpeedValue = new JLabel("60");
+		SpeedValue.setForeground(Color.WHITE);
 		SpeedValue.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		SpeedValue.setHorizontalAlignment(SwingConstants.CENTER);
 		SpeedValue.setBounds((3*outputSubPanelWidth)/4, 0, outputSubPanelWidth/4, outputSubPanelHeight/2);
 		FinalOutputPanel.add(SpeedValue);
 		
 		JLabel KeyValue = new JLabel("WA");
+		KeyValue.setForeground(Color.WHITE);
 		KeyValue.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		KeyValue.setHorizontalAlignment(SwingConstants.CENTER);
 		KeyValue.setBounds((3*outputSubPanelWidth)/4, outputSubPanelHeight/2, outputSubPanelWidth/4, outputSubPanelHeight/2);
 		FinalOutputPanel.add(KeyValue);
 		
 		JPanel NetworkPanel = new JPanel();
-		NetworkPanel.setBackground(new Color(242, 217, 249));
+		NetworkPanel.setBackground(darkColor);
 		NetworkPanel.setBounds(8, lowerPanelY, mainPanelWidth, mainPanelHeight);
 		MainFrame.getContentPane().add(NetworkPanel);
 		NetworkPanel.setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setEnabled(false);
 		scrollPane.setViewportBorder(null);
+		scrollPane.setEnabled(false);
 		scrollPane.setBounds(0, 0, mainPanelWidth, mainPanelHeight - 100);
 		NetworkPanel.add(scrollPane);
 		
 		JPanel NetworkSubPanel = new JPanel();
-		NetworkSubPanel.setBackground(new Color(242, 217, 249));
+		NetworkSubPanel.setBackground(darkColor);
 		scrollPane.setViewportView(NetworkSubPanel);
 		NetworkSubPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		
 		NetworkLabel = new JLabel(("<html><body style='padding: 10px;'>" + ser.getINetworkDetailsHTML() + "</body></html>"));
+		NetworkLabel.setForeground(Color.WHITE);
 		NetworkLabel.setBounds(0, 0, 700, 370);
 		NetworkLabel.setVerticalAlignment(SwingConstants.TOP);
 		NetworkLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -312,28 +334,31 @@ public class GUI {
 		PortValueInput.setColumns(10);
 		
 		JPanel NamePanel = new JPanel();
-		NamePanel.setBackground(new Color(242, 217, 249));
+		NamePanel.setBackground(darkColor);
 		NamePanel.setBounds(rightPanelX, lowerPanelY, mainPanelWidth, mainPanelHeight);
 		MainFrame.getContentPane().add(NamePanel);
 		NamePanel.setLayout(null);
 		
 		JLabel ProjectLabel = new JLabel("<html><body style='text-align: center'>DRAN</body></html>");
-		ProjectLabel.setBounds(0, 0, 700, nameLabelMajorHeight);
+		ProjectLabel.setForeground(Color.WHITE);
+		ProjectLabel.setBounds(0, 0, mainPanelWidth, nameLabelMajorHeight);
 		ProjectLabel.setFont(new Font("Tahoma", Font.BOLD, 38));
 		ProjectLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		NamePanel.add(ProjectLabel);
 		
 		JLabel SubProjectLabel = new JLabel("<html><body style='text-align: center'>Drive Autonomous</body></html>");
-		SubProjectLabel.setBounds(0, 0, 700, nameLabelMajorHeight+100);
+		SubProjectLabel.setForeground(Color.WHITE);
+		SubProjectLabel.setBounds(0, 0, mainPanelWidth, nameLabelMajorHeight+100);
 		SubProjectLabel.setFont(new Font("Tahoma", Font.PLAIN, 28));
 		SubProjectLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		NamePanel.add(SubProjectLabel);
 		
-		JLabel CreaterLabel = new JLabel("Made by Tushar Jain (20UCS211)");
-		CreaterLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		CreaterLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		CreaterLabel.setBounds(0, nameLabelMajorHeight, 700, nameLabelMinorHeight);
-		NamePanel.add(CreaterLabel);
+		JLabel CreatorLabel = new JLabel("Made by Tushar Jain (20UCS211)");
+		CreatorLabel.setForeground(Color.WHITE);
+		CreatorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		CreatorLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		CreatorLabel.setBounds(0, nameLabelMajorHeight, mainPanelWidth, nameLabelMinorHeight);
+		NamePanel.add(CreatorLabel);
 	}
 	
 	public void setGrabbedImage() {
